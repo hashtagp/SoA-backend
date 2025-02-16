@@ -53,10 +53,29 @@ export const loginUser = async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-    req.cookies.token = token;
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '24h'
+    });
+    
+    // Set cookie with token
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false, // Set to true in production with HTTPS
+      sameSite: 'lax',
+      maxAge:10 * 365 * 24 * 60 * 60 * 1000, //  10 yrs
+      path: '/',
+    });
 
-    res.json({ success: true, message: "Login successful", token });
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        username: user.username
+      }
+    });
 
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error", error });
