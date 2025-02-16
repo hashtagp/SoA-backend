@@ -4,9 +4,9 @@ import mongoose from "mongoose";
 import cors from "cors";
 import path from "path";
 import cookieParser from "cookie-parser";
-import connectToDatabase from "./config/db.js";
+import connectToDatabase from "./config/dbConfig.js";
 import userRouter from "./routes/userRoutes.js";
-import adminRouter from "./routes/productRoutes.js";
+import adminRouter from "./routes/adminRoutes.js";
 import testRouter from "./routes/testRoutes.js";
 import authMiddleware from "./middlewares/authmiddleware.js";
 

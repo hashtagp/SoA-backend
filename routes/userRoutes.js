@@ -1,11 +1,11 @@
 import express from "express";
-import { registerUser, loginUser, forgotPassword, verifyOTPAndResetPassword } from "../controllers/userController.js";
+import { registerUser, loginUser, forgotPassword, verifyOTPAndResetPassword } from "../controllers/userControllers.js";
 
 const userRouter = express.Router();
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.post("/forget", forgotPassword);
-router.post("/reset", verifyOTPAndResetPassword);
+userRouter.post("/register", registerUser);
+userRouter.post("/login", loginUser);
+userRouter.post("/forget", forgotPassword);
+userRouter.post("/reset", verifyOTPAndResetPassword);
 
-module.exports = userRouter;
+export default userRouter;
