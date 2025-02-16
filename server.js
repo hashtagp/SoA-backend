@@ -22,7 +22,6 @@ connectToDatabase();
 app.use("/api/users",userRouter);
 app.use("/api/admin",adminRouter);
 app.use("/api/test",testRouter);
-app.use("/api/verify",authMiddleware);
 
 app.get("/",(req,res)=>{
     res.send("Api is running");

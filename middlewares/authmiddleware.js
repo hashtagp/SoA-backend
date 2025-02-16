@@ -12,7 +12,7 @@ const authMiddleware = (req, res, next) => {
             return res.status(401).json({ success: false, message: "Access denied. No token provided." });
         }
 
-        if(req.path==="/api/verify"){
+        if(req.path==="/api/users/verify"){
             return res.status(200).json({ success: true, message: "Token is valid." });
         }
 
