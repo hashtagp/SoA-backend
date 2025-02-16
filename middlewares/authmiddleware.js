@@ -5,22 +5,26 @@ dotenv.config();
 
 const authMiddleware = (req, res, next) => {
     try {
-  const token = req.header("Authorization");
+        const token = req.cookies.token;
 
-  // Check if token is provided
-  if (!token) {
-    return res.status(401).json({ message: "Access denied. No token provided." });
-  }
+        // Check if token is provided
+        if (!token) {
+            return res.status(401).json({ success: false, message: "Access denied. No token provided." });
+        }
 
-    // Verify token
-    const decoded = jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET);
+        if(req.path==="/api/verify"){
+            return res.status(200).json({ success: true, message: "Token is valid." });
+        }
 
-    // Attach user data to request object
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return res.status(403).json({ message: "Invalid or expired token." });
-  }
+        // Verify token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Attach user data to request object
+        req.user = decoded;
+        next();
+    } catch (error) {
+        return res.status(403).json({ success: false, message: "Invalid or expired token." });
+    }
 };
 
 module.exports = authMiddleware;

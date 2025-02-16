@@ -3,19 +3,26 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
 import path from "path";
+import cookieParser from "cookie-parser";
+import connectToDatabase from "./config/db.js";
 import userRouter from "./routes/userRoutes.js";
 import adminRouter from "./routes/productRoutes.js";
 import testRouter from "./routes/testRoutes.js";
+import authMiddleware from "./middlewares/authmiddleware.js";
 
 const app = express();
 dotenv.config();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
+
+connectToDatabase();
 
 app.use("/api/users",userRouter);
 app.use("/api/admin",adminRouter);
 app.use("/api/test",testRouter);
+app.use("/api/verify",authMiddleware);
 
 app.get("/",(req,res)=>{
     res.send("Api is running");
