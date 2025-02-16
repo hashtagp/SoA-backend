@@ -12,10 +12,7 @@ const authMiddleware = (req, res, next) => {
             return res.status(401).json({ success: false, message: "Access denied. No token provided." });
         }
 
-        if(req.path==="/api/verify"){
-            return res.status(200).json({ success: true, message: "Token is valid." });
-        }
-
+      
         // Verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
