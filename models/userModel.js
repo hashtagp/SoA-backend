@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
       default: null, // Default is null if the user hasn't answered
     }
   }],
+  visitedQuestions: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Question",
+  }],
   startTime: {
     type: Date, // Will be set when test starts
   },

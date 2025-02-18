@@ -38,8 +38,7 @@ export const startTest = async (req, res) => {
 // Save Test Progress
 export const saveTest = async (req, res) => {
   try {
-    const { userId } = req.body;
-    const { testData, currentDate } = req.body; // Test answers and current timestamp
+    const { userId, testData, visitedQuestions, currentDate } = req.body; // Test answers, visited questions, and current timestamp
 
     // Find the user
     const user = await User.findById(userId);
@@ -66,6 +65,9 @@ export const saveTest = async (req, res) => {
       return question; // Keep existing if not updated
     });
 
+    // Update the user's visited questions
+    user.visitedQuestions = visitedQuestions;
+
     await user.save();
     res.status(200).json({ success: true, message: "Test saved successfully!" });
 
@@ -90,13 +92,12 @@ export const fetchTest = async (req, res) => {
       return res.status(400).json({ success: false, message: "No active test found for the user." });
     }
 
-    res.status(200).json({ success: true, message: "Test data fetched successfully!", testData: user.testData });
+    res.status(200).json({ success: true, message: "Test data fetched successfully!", testData: user.testData, startTime: user.startTime, endTime: user.endTime, visitedQuestions: user.visitedQuestions });
 
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error", error });
   }
 };
-
 
 // Get Test Result
 export const getTestResult = async (req, res) => {
@@ -116,13 +117,48 @@ export const getTestResult = async (req, res) => {
 
     // Calculate the number of correct answers
     let correctAnswers = 0;
+    let unattempted = 0;
     user.testData.forEach(question => {
       if (question.chosenAnswer === question.questionId.answer) {
         correctAnswers++;
       }
+      if(question.chosenAnswer === null){
+        unattempted++;
+      }
     });
 
-    res.status(200).json({ success: true, message: "Test result calculated successfully!", correctAnswers, totalQuestions: user.testData.length });
+    res.status(200).json({ success: true, message: "Test result calculated successfully!", correctAnswers, totalQuestions: user.testData.length, unattempted });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error });
+  }
+};
+
+// Retry Test - Set a new start time for the test
+export const retryTest = async (req, res) => {
+  try {
+    const { userId, newStartTime } = req.body;
+
+    // Find the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Set new start time and end time
+    user.startTime = new Date(newStartTime);
+    user.endTime = new Date(user.startTime.getTime() + 30 * 60 * 1000); // Example: 30 mins duration
+
+    // Set chosenAnswer to null for all questions in testData
+    user.testData = user.testData.map(question => ({
+      ...question,
+      chosenAnswer: null
+    }));
+    user.visitedQuestions = []; // Reset visited questions
+
+    await user.save();
+
+    res.status(200).json({ success: true, message: "Test start time updated successfully!", startTime: user.startTime, endTime: user.endTime });
 
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error", error });
